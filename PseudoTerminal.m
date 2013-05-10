@@ -3791,9 +3791,43 @@ NSString *sessionsKey = @"sessions";
                              frameName:@"myFrameName"
                              groupName:@"myGroupName"];
     [webView retain];
-    [webView setValue:@"http://google.com" forKey:@"mainFrameURL"];
+    [webView setValue:@"http://localhost/test/" forKey:@"mainFrameURL"];
+    [webView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [sessionView addSubview:webView];
     [webView release];
+
+    [sessionView addConstraint:
+        [NSLayoutConstraint constraintWithItem:webView
+            attribute:NSLayoutAttributeLeft
+            relatedBy:NSLayoutRelationEqual
+            toItem:sessionView
+            attribute:NSLayoutAttributeLeft
+            multiplier:1
+            constant:0]];
+    [sessionView addConstraint:
+        [NSLayoutConstraint constraintWithItem:webView
+            attribute:NSLayoutAttributeRight
+            relatedBy:NSLayoutRelationEqual
+            toItem:sessionView
+            attribute:NSLayoutAttributeRight
+            multiplier:1
+            constant:0]];
+    [sessionView addConstraint:
+        [NSLayoutConstraint constraintWithItem:webView
+            attribute:NSLayoutAttributeTop
+            relatedBy:NSLayoutRelationEqual
+            toItem:sessionView
+            attribute:NSLayoutAttributeTop
+            multiplier:1
+            constant:20]];
+    [sessionView addConstraint:
+        [NSLayoutConstraint constraintWithItem:webView
+            attribute:NSLayoutAttributeBottom
+            relatedBy:NSLayoutRelationEqual
+            toItem:sessionView
+            attribute:NSLayoutAttributeBottom
+            multiplier:1
+            constant:0]];
     //
 
     [self fitTabsToWindow];
