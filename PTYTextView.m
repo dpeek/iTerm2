@@ -4117,6 +4117,20 @@ static double EuclideanDistance(NSPoint p1, NSPoint p2) {
                                                      targetSession:[dataSource session]];
 }
 
+- (void)splitTextViewVerticallyWebkit:(id)sender
+{
+    [[[[dataSource session] tab] realParentWindow] splitWebkitVertically:YES
+                                                      withBookmark:[[ProfileModel sharedInstance] defaultBookmark]
+                                                     targetSession:[dataSource session]];
+}
+
+- (void)splitTextViewHorizontallyWebkit:(id)sender
+{
+    [[[[dataSource session] tab] realParentWindow] splitWebkitVertically:NO
+                                                      withBookmark:[[ProfileModel sharedInstance] defaultBookmark]
+                                                     targetSession:[dataSource session]];
+}
+
 - (void)movePane:(id)sender
 {
     [[MovePaneController sharedInstance] movePane:[dataSource session]];
@@ -4220,6 +4234,8 @@ static double EuclideanDistance(NSPoint p1, NSPoint p2) {
     } else if ([item action] == @selector(selectAll:) ||
                [item action]==@selector(splitTextViewVertically:) ||
                [item action]==@selector(splitTextViewHorizontally:) ||
+               [item action]==@selector(splitTextViewVerticallyWebkit:) ||
+               [item action]==@selector(splitTextViewHorizontallyWebkit:) ||
                [item action]==@selector(clearTextViewBuffer:) ||
                [item action]==@selector(editTextViewSession:) ||
                [item action]==@selector(closeTextViewSession:) ||
@@ -4419,6 +4435,12 @@ static double EuclideanDistance(NSPoint p1, NSPoint p2) {
     [[theMenu itemAtIndex:[theMenu numberOfItems] - 1] setTarget:self];
     [theMenu addItemWithTitle:@"Split Pane Horizontally" action:@selector(splitTextViewHorizontally:) keyEquivalent:@""];
     [[theMenu itemAtIndex:[theMenu numberOfItems] - 1] setTarget:self];
+
+    [theMenu addItemWithTitle:@"Split Pane Vertically (webkit)" action:@selector(splitTextViewVerticallyWebkit:) keyEquivalent:@""];
+    [[theMenu itemAtIndex:[theMenu numberOfItems] - 1] setTarget:self];
+    [theMenu addItemWithTitle:@"Split Pane Horizontally (webkit)" action:@selector(splitTextViewHorizontallyWebkit:) keyEquivalent:@""];
+    [[theMenu itemAtIndex:[theMenu numberOfItems] - 1] setTarget:self];
+
     [theMenu addItemWithTitle:@"Move Session to Split Pane" action:@selector(movePane:) keyEquivalent:@""];
     [[theMenu itemAtIndex:[theMenu numberOfItems] - 1] setTarget:self];
     [theMenu addItemWithTitle:@"Move Session to Window" action:@selector(moveSessionToWindow:) keyEquivalent:@""];

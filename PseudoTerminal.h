@@ -699,7 +699,13 @@ NSWindowDelegate,
 // Splitting
 - (BOOL)canSplitPaneVertically:(BOOL)isVertical withBookmark:(Profile*)theBookmark;
 - (void)splitVertically:(BOOL)isVertical withBookmarkGuid:(NSString*)guid;
+- (void)splitWebkitVertically:(BOOL)isVertical withBookmark:(Profile*)theBookmark targetSession:(PTYSession*)targetSession;
 - (void)splitVertically:(BOOL)isVertical withBookmark:(Profile*)theBookmark targetSession:(PTYSession*)targetSession;
+- (void)splitWebkitVertically:(BOOL)isVertical
+                       before:(BOOL)before
+                addingSession:(PTYSession*)newSession
+                targetSession:(PTYSession*)targetSession
+                 performSetup:(BOOL)performSetup;
 - (void)splitVertically:(BOOL)isVertical
                  before:(BOOL)before
           addingSession:(PTYSession*)newSession

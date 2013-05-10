@@ -78,6 +78,7 @@
 #import "ColorsMenuItemView.h"
 #import "iTermFontPanel.h"
 #import "FutureMethods.h"
+#import <WebKit/WebKit.h>
 
 #define CACHED_WINDOW_POSITIONS 100
 
@@ -3752,6 +3753,88 @@ NSString *sessionsKey = @"sessions";
         [self setDimmingForSession:targetSession];
     [sessionView updateDim];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"iTermNumberOfSessionsDidChange" object: self userInfo: nil];
+}
+
+// NSWebView *webView;
+
+- (void)splitWebkitVertically:(BOOL)isVertical
+                       before:(BOOL)before
+                addingSession:(PTYSession*)newSession
+                targetSession:(PTYSession*)targetSession
+                 performSetup:(BOOL)performSetup
+{
+    NSView *scrollView;
+    SessionView* sessionView = [[self currentTab] splitVertically:isVertical
+                                                           before:before
+                                                    targetSession:targetSession];
+    [sessionView setSession:newSession];
+    [newSession setTab:[self currentTab]];
+    scrollView = [[[newSession view] subviews] objectAtIndex:0];
+    [newSession setView:sessionView];
+    NSSize size = [sessionView frame].size;
+    if (performSetup) {
+        [self setupSession:newSession title:nil withSize:&size];
+        scrollView = [[[newSession view] subviews] objectAtIndex:0];
+    }
+
+    // Move the scrollView created by PTYSession into sessionView.
+    [scrollView retain];
+    [scrollView removeFromSuperview];
+    [sessionView addSubview:scrollView];
+    [scrollView release];
+    if (!performSetup) {
+        [scrollView setFrameSize:[sessionView frame].size];
+    }
+    
+    // WebKit
+    WebView *webView = [[WebView alloc] initWithFrame:[scrollView frame]
+                             frameName:@"myFrameName"
+                             groupName:@"myGroupName"];
+    [webView retain];
+    [webView setValue:@"http://google.com" forKey:@"mainFrameURL"];
+    [sessionView addSubview:webView];
+    [webView release];
+    //
+
+    [self fitTabsToWindow];
+    if (targetSession == [[self currentTab] activeSession]) {
+        [[self currentTab] setActiveSessionPreservingViewOrder:newSession];
+    }
+    [[self currentTab] recheckBlur];
+    [[self currentTab] numberOfSessionsDidChange];
+        [self setDimmingForSession:targetSession];
+    [sessionView updateDim];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"iTermNumberOfSessionsDidChange" object: self userInfo: nil];
+}
+
+- (void)splitWebkitVertically:(BOOL)isVertical
+                 withBookmark:(Profile*)theBookmark
+                targetSession:(PTYSession*)targetSession
+{
+    if ([targetSession isTmuxClient]) {
+        [[targetSession tmuxController] splitWindowPane:[targetSession tmuxPane] vertically:isVertical];
+        return;
+    }
+    PtyLog(@"--------- splitVertically -----------");
+    if (![self canSplitPaneVertically:isVertical withBookmark:theBookmark]) {
+        NSBeep();
+        return;
+    }
+
+    NSString *oldCWD = nil;
+    /* Get currently selected tabviewitem */
+    if ([self currentSession]) {
+        oldCWD = [[[self currentSession] SHELL] getWorkingDirectory];
+    }
+
+    PTYSession* newSession = [[self newSessionWithBookmark:theBookmark] autorelease];
+    [self splitWebkitVertically:isVertical
+                         before:NO
+                  addingSession:newSession
+                  targetSession:targetSession
+                   performSetup:YES];
+
+    [self runCommandInSession:newSession inCwd:oldCWD forObjectType:iTermPaneObject];
 }
 
 - (void)splitVertically:(BOOL)isVertical
